@@ -68,7 +68,17 @@ check_pr() { # $1 clone, $2 PR number
     deny "Merge blocked: PR #$2's head ${sha:0:9} has no code review. Run /code-review high against main, fix or answer every finding, commit and push, run the checks in AGENTS.md, then scripts/mark-reviewed.sh and retry. (Last reviewed commit: ${reviewed:-none}.)"
 }
 
-GUARD_FILES='\.githooks/|require-code-review\.sh|mark-reviewed\.sh|install-hooks\.sh|\.claude/settings\.json'
+GUARD_FILES='\.githooks/|require-code-review\.sh|mark-reviewed\.sh|install-hooks\.sh|\.claude/settings(\.local)?\.json'
+
+# The folder a git or gh command runs in: git -C DIR, else a cd/pushd DIR in the command, else the cwd.
+run_dir() {
+  local dir
+  dir=$(grep -Eo 'git[[:space:]]+-C[[:space:]]+[^[:space:];&|]+' <<<"$cmd" | tail -1 | awk '{print $3}')
+  [ -n "$dir" ] || dir=$(grep -Eo '(^|[;&|(][[:space:]]*)(cd|pushd)[[:space:]]+[^[:space:];&|)]+' <<<"$cmd" | tail -1 | awk '{print $NF}')
+  dir=$(tr -d "\"'" <<<"${dir:-$cwd}")
+  case $dir in /*) ;; "~"*) dir="$HOME${dir#\~}" ;; *) dir="$cwd/$dir" ;; esac
+  echo "$dir"
+}
 
 case $tool in
   Bash)
@@ -76,11 +86,6 @@ case $tool in
     # The review mark is written only by scripts/mark-reviewed.sh, whose command line doesn't name it.
     grep -q 'code-review-ok' <<<"$cmd" &&
       deny "The review mark is written only by scripts/mark-reviewed.sh, after a review (AGENTS.md)."
-    # Changing the guard's own files needs the user's OK.
-    if grep -Eq "$GUARD_FILES" <<<"$cmd" &&
-      grep -Eq '>|(^|[^[:alnum:]_-])(rm|mv|cp|tee|chmod|truncate|ln)[[:space:]]|sed[[:space:]]+(-[[:alnum:]]*[[:space:]]+)*-i|git[[:space:]]+(checkout|restore|rm|mv)' <<<"$cmd"; then
-      ask "This command may change the review guard's own files (AGENTS.md). Allow it?"
-    fi
     # Switching the git hooks off. Every core.hooksPath in the command must set .githooks or only read it.
     # git config keys aren't case-sensitive.
     all=$(grep -Eio 'core\.hookspath' <<<"$cmd" | wc -l)
@@ -88,22 +93,21 @@ case $tool in
     if [ "$all" -gt "$ok" ] || { [ "$all" -gt 0 ] && grep -Eq -- '--(unset|unset-all|remove-section|rename-section|replace-all|edit)([[:space:]]|$)' <<<"$cmd"; }; then
       deny "Changing core.hooksPath away from .githooks is blocked: it switches off the review guard."
     fi
-    if grep -Eq 'push' <<<"$cmd" && grep -Eq -- '--no-verify' <<<"$cmd"; then
+    # git takes any unique prefix of a long option, so --no-veri is --no-verify.
+    if grep -Eq 'push' <<<"$cmd" && grep -Eq -- '--no-v' <<<"$cmd"; then
       deny "git push --no-verify is blocked: it skips the review guard."
     fi
-    # A push runs in: git -C DIR, else a cd DIR in the command, else the cwd.
-    # From a guarded clone it needs the pre-push hook switched on.
+    # A push needs the pre-push hook switched on in the clone it runs in and,
+    # since that can be guessed wrong, in every guarded clone nearby.
     if grep -Eq '(^|[^[:alnum:]_-])git([[:space:]].*)?[[:space:]]push([[:space:]]|$)' <<<"$cmd"; then
-      dir=$(grep -Eo 'git[[:space:]]+-C[[:space:]]+[^[:space:];&|]+' <<<"$cmd" | tail -1 | awk '{print $3}')
-      [ -n "$dir" ] || dir=$(grep -Eo '(^|[;&|(][[:space:]]*)cd[[:space:]]+[^[:space:];&|)]+' <<<"$cmd" | tail -1 | awk '{print $NF}')
-      dir=$(tr -d "\"'" <<<"${dir:-$cwd}")
-      case $dir in /*) ;; "~"*) dir="$HOME${dir#\~}" ;; *) dir="$cwd/$dir" ;; esac
+      dir=$(run_dir)
       git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 ||
         deny "Push blocked: $dir isn't a clone yet, so the review guard can't be checked. Clone first, run scripts/install-hooks.sh there, then push."
-      if guarded "$dir"; then
-        [ "$(git -C "$dir" config core.hooksPath)" = .githooks ] ||
-          deny "Push blocked: the review guard isn't switched on in $dir. Run scripts/install-hooks.sh there first."
-      fi
+      while read -r d; do
+        guarded "$d" || continue
+        [ "$(git -C "$d" config core.hooksPath)" = .githooks ] ||
+          deny "Push blocked: the review guard isn't switched on in $d. Run scripts/install-hooks.sh there first."
+      done < <({ echo "$dir"; candidates; } | awk '!seen[$0]++')
     fi
     # GitHub's REST or GraphQL API: merging a pull request or writing a branch or file outside git.
     if grep -Eq '(^|[^[:alnum:]_-])(gh[[:space:]]+api|curl)([[:space:]]|$)' <<<"$cmd"; then
@@ -118,18 +122,25 @@ case $tool in
       grep -Eq -- '--auto([[:space:]]|$)' <<<"$cmd" &&
         deny "Auto-merge is blocked: the PR would merge later without a check that its final commit was reviewed. Merge it once it's reviewed instead."
       pr=$(sed -nE 's/.*gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+#?([0-9]+)([[:space:]]|$|[;&|]).*/\1/p' <<<"$cmd")
-      target=$(grep -Eo -- '(-R|--repo)[[:space:]=]+[^[:space:];&|]+' <<<"$cmd" | tail -1 | sed -E 's/^(-R|--repo)[[:space:]=]+//' | tr -d "\"'")
+      target=$(grep -Eo -- '(-R|--repo|GH_REPO)[[:space:]=]+[^[:space:];&|]+' <<<"$cmd" | tail -1 | sed -E 's/^(-R|--repo|GH_REPO)[[:space:]=]+//' | tr -d "\"'")
+      [ -n "$target" ] || target=${GH_REPO:-}
       if [ -n "$target" ]; then
         target=${target##*github.com/}
         d=$(clone_of "${target%%/*}" "${target#*/}" || true)
         [ -n "$d" ] || deny "Merge blocked: no local clone of $target here to check its code review. Merge from inside a clone of it."
       else
-        d=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || true)
+        d=$(git -C "$(run_dir)" rev-parse --show-toplevel 2>/dev/null) ||
+          deny "Merge blocked: run 'gh pr merge' inside a clone of the repository, so its code review can be checked."
       fi
-      if [ -n "$d" ] && guarded "$d"; then
+      if guarded "$d"; then
         [ -n "$pr" ] || deny "Merge blocked: write the PR number right after 'gh pr merge' so its head can be checked for a code review."
         check_pr "$d" "$pr"
       fi
+    fi
+    # Last, after every deny above: changing the guard's own files needs the user's OK.
+    if grep -Eq "$GUARD_FILES" <<<"$cmd" &&
+      grep -Eq '>|(^|[^[:alnum:]_-])(rm|mv|cp|tee|chmod|truncate|ln)[[:space:]]|sed[[:space:]]+(-[[:alnum:]]*[[:space:]]+)*-i|git[[:space:]]+(checkout|restore|rm|mv)' <<<"$cmd"; then
+      ask "This command may change the review guard's own files (AGENTS.md). Allow it?"
     fi
     ;;
   Write | Edit | MultiEdit | NotebookEdit)
