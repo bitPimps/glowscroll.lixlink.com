@@ -75,7 +75,11 @@ run_dir() {
   local dir
   dir=$(grep -Eo 'git[[:space:]]+-C[[:space:]]+[^[:space:];&|]+' <<<"$cmd" | tail -1 | awk '{print $3}')
   [ -n "$dir" ] || dir=$(grep -Eo '(^|[;&|(][[:space:]]*)(cd|pushd)[[:space:]]+[^[:space:];&|)]+' <<<"$cmd" | tail -1 | awk '{print $NF}')
-  dir=$(tr -d "\"'" <<<"${dir:-$cwd}")
+  dir=$(tr -d "\"'{}" <<<"${dir:-$cwd}")
+  dir=${dir//\$CLAUDE_PROJECT_DIR/${CLAUDE_PROJECT_DIR:-$cwd}}
+  dir=${dir//\$HOME/$HOME}
+  dir=${dir//\$PWD/$cwd}
+  case $dir in *'$'*) dir=$cwd ;; esac # another variable: can't tell, use the cwd
   case $dir in /*) ;; "~"*) dir="$HOME${dir#\~}" ;; *) dir="$cwd/$dir" ;; esac
   echo "$dir"
 }
@@ -94,11 +98,12 @@ case $tool in
       deny "Changing core.hooksPath away from .githooks is blocked: it switches off the review guard."
     fi
     # git takes any unique prefix of a long option, so --no-veri is --no-verify.
-    if grep -Eq 'push' <<<"$cmd" && grep -Eq -- '--no-v' <<<"$cmd"; then
+    if grep -Eq '(^|[^[:alnum:]_-])git([[:space:]][^;&|]*)?[[:space:]]push([[:space:]][^;&|]*)?[[:space:]]--no-v' <<<"$cmd"; then
       deny "git push --no-verify is blocked: it skips the review guard."
     fi
-    # A push needs the pre-push hook switched on in the clone it runs in and,
-    # since that can be guessed wrong, in every guarded clone nearby.
+    # A push needs the pre-push hook switched on in the clone it runs in. That
+    # folder can be guessed wrong, so it's switched on in every guarded clone
+    # nearby (what scripts/install-hooks.sh does).
     if grep -Eq '(^|[^[:alnum:]_-])git([[:space:]].*)?[[:space:]]push([[:space:]]|$)' <<<"$cmd"; then
       dir=$(run_dir)
       git -C "$dir" rev-parse --git-dir >/dev/null 2>&1 ||
@@ -106,7 +111,8 @@ case $tool in
       while read -r d; do
         guarded "$d" || continue
         [ "$(git -C "$d" config core.hooksPath)" = .githooks ] ||
-          deny "Push blocked: the review guard isn't switched on in $d. Run scripts/install-hooks.sh there first."
+          git -C "$d" config core.hooksPath .githooks ||
+          deny "Push blocked: couldn't switch the review guard on in $d. Run scripts/install-hooks.sh there first."
       done < <({ echo "$dir"; candidates; } | awk '!seen[$0]++')
     fi
     # GitHub's REST or GraphQL API: merging a pull request or writing a branch or file outside git.
@@ -124,6 +130,12 @@ case $tool in
       pr=$(sed -nE 's/.*gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+#?([0-9]+)([[:space:]]|$|[;&|]).*/\1/p' <<<"$cmd")
       target=$(grep -Eo -- '(-R|--repo|GH_REPO)[[:space:]=]+[^[:space:];&|]+' <<<"$cmd" | tail -1 | sed -E 's/^(-R|--repo|GH_REPO)[[:space:]=]+//' | tr -d "\"'")
       [ -n "$target" ] || target=${GH_REPO:-}
+      # A PR URL names both the repository and the number.
+      url=$(grep -Eo 'github\.com/[^/[:space:]]+/[^/[:space:]]+/pull/[0-9]+' <<<"$cmd" | tail -1)
+      if [ -n "$url" ]; then
+        pr=${url##*/}
+        target=$(cut -d/ -f2-3 <<<"$url")
+      fi
       if [ -n "$target" ]; then
         target=${target##*github.com/}
         d=$(clone_of "${target%%/*}" "${target#*/}" || true)
