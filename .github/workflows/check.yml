@@ -31,3 +31,15 @@ jobs:
             --no-progress
             '*.html'
           fail: true
+
+      # Every page loads GlowScroll's own GTM container (script + noscript), and no
+      # other container. A future share page under s/ must load none (AGENTS.md).
+      - name: Check GTM container
+        run: |
+          status=0
+          for f in $(find . -name '*.html' -not -path './.git/*' -not -path './s/*'); do
+            [ "$(grep -o 'GTM-5RXX3PNS' "$f" | wc -l)" -eq 2 ] || { echo "$f: needs GTM-5RXX3PNS in its script and noscript"; status=1; }
+          done
+          if grep -rEn --include='*.html' 'GTM-[A-Z0-9]+' . | grep -v 'GTM-5RXX3PNS'; then echo "Other GTM container found"; status=1; fi
+          if [ -d s ] && grep -rln --include='*.html' 'googletagmanager' s; then echo "s/ must not load GTM"; status=1; fi
+          exit $status
