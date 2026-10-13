@@ -1,23 +1,55 @@
 # glowscroll.lixlink.com
 
-Marketing and support website for **GlowScroll – LED Banner & Scroller**, published by THE LIX GROUP LLC. The app lives in [`bitPimps/glowscroll`](https://github.com/bitPimps/glowscroll).
+Marketing and support site for **GlowScroll: LED Banner & Sign**, published by THE LIX GROUP LLC. The app lives in [`bitPimps/glowscroll`](https://github.com/bitPimps/glowscroll). Static site, no build step, no framework — built the same way as `steady.lixlink.com`.
 
-**Status:** planning. The site plan (pages, hosting, analytics rules) is in the app repo: [`docs/07-roadmap-and-delivery.md` → Website](https://github.com/bitPimps/glowscroll/blob/main/docs/07-roadmap-and-delivery.md#website-glowscrolllixlinkcom).
+## Pages
 
-## How it works
+- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (**"coming soon"** until the app is in the stores)
+- `faq.html`: searchable Help Center. Section ids (`#getting-started`, `#showing-signs`, `#saved-banners`, `#privacy-data`, `#premium`, `#troubleshooting`) are stable so in-app help can link to them
+- `privacy.html`: privacy policy (App Store and Google Play require its URL)
+- `delete-data.html`: how to delete on-device data and purchase records
+- `404.html`: not-found page
+- `llms.txt`, `robots.txt`, `sitemap.xml`: discovery files. Update `llms.txt` and the sitemap when pages, features or pricing change. JSON-LD lives in each page's `<head>`; the FAQPage schema in `faq.html` must match the visible FAQ word for word.
 
-- Plain static HTML/CSS, same approach as `steady.lixlink.com` and `thymeit.lixlink.com`.
-- Hosted on **GitHub Pages** (Settings → Pages → Deploy from a branch: `main`, root). No build step.
-- Custom domain `glowscroll.lixlink.com` via a `CNAME` file and a DNS `CNAME glowscroll → bitpimps.github.io`.
-- **Google Analytics 4** on site pages — except the 1.1 share-link page (`/s`), which must load no analytics.
+## Structure
 
-## Planned pages
+```
+assets/css/style.css   shared stylesheet (dark only; tokens match the app's theme-colors.js)
+assets/js/main.js      mobile nav toggle + FAQ search/filter (from Steady's site)
+assets/img/            favicons, app icon, og-image.png (1200×630), LED sign images, store badges
+.nojekyll              tells GitHub Pages not to run Jekyll (needed later for .well-known/)
+```
 
-| Page | Purpose |
-|------|---------|
-| `index.html` | Landing page, store badges |
-| `privacy.html` | Privacy policy (required by both stores) |
-| `faq.html` | Support / FAQ (store support URL) |
-| `delete-data.html` | How to delete local data and backups |
-| `404.html` | Not found |
-| `s/index.html` (1.1) | Share-link preview, no analytics |
+The LED sign images and icons were drawn with the app's own LED shader and icon (`scripts/make-icons.mjs` in the app repo). Replace them with real screenshots once device builds exist.
+
+## Deployment
+
+GitHub Pages, **Settings → Pages → Deploy from a branch**: `main`, `/ (root)`. Every push to `main` publishes.
+
+Custom domain (manual, account owner):
+1. At the DNS provider for `lixlink.com`, add `CNAME glowscroll → bitpimps.github.io`.
+2. In this repo's **Settings → Pages**, set the custom domain to `glowscroll.lixlink.com` (already in the `CNAME` file) and tick **Enforce HTTPS** once the certificate is issued.
+
+## Analytics
+
+Google Analytics 4 through Google Tag Manager, using the **same GTM container as steady.lixlink.com** (`GTM-TBTCJTLQ`). If GA4 should report GlowScroll separately, add a GA4 tag or hostname filter for `glowscroll.lixlink.com` in that container. The app itself has no analytics. The planned share-link page (`/s`, app 1.1) must **not** load GTM, because the banner text is in its URL.
+
+## Checks
+
+`.github/workflows/check.yml` runs [lychee](https://github.com/lycheeverse/lychee) on every PR and push to `main` and fails on a broken internal link, image or `#anchor`. Locally:
+
+```
+lychee --offline --root-dir "$PWD" --index-files index.html --include-fragments '*.html'
+```
+
+Dependabot opens a monthly PR to bump GitHub Actions versions.
+
+## Keeping the site in sync
+
+Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section, `llms.txt` and the home page. Never advertise unshipped features.
+
+**Before launch, check:**
+- Real store badges and links in `index.html` `#download` (replace "coming soon"); add the price
+- Support mailbox `glowscroll-support@lixlink.com` exists
+- "Any language, any emoji" claim verified on real phones
+- When cloud backup and export/import ship in the app, add them to the home page, FAQ (`#backup-restore`), privacy policy and delete-data page

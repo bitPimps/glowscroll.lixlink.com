@@ -1,0 +1,874 @@
+/* GlowScroll site. Dark only, like the app: the palette matches the app's
+   theme tokens (theme-colors.js) so the site and the product feel like one thing. */
+
+:root {
+  --bg: #0b0b0d;
+  --surface: #16161a;
+  --elevated: #1f1f25;
+  --border: #2a2a31;
+  --text: #f4f2ee;
+  --text-muted: #9a9890;
+
+  --accent: #ffb000;
+  --accent-pressed: #d99600;
+  --accent-soft: #3a2a00;
+  --accent-text: #ffcf66;
+  --danger: #e5736a;
+
+  --dark-bg: #0b0b0d;
+  --dark-surface: #16161a;
+
+  --max-width: 1120px;
+  --radius: 20px;
+  --radius-sm: 12px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Nav */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.brand img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.brand span {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+}
+
+.nav-links a.nav-cta {
+  background: var(--accent);
+  color: #000000;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-toggle {
+  display: none;
+}
+
+/* Hero */
+
+.hero {
+  padding: 0;
+  background: var(--dark-bg);
+  color: #f6f4f2;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 48px;
+  padding: 88px 24px 96px;
+}
+
+.eyebrow {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-text);
+  background: rgba(255, 176, 0, 0.12);
+  padding: 6px 12px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: clamp(2.1rem, 4.4vw, 3.2rem);
+  line-height: 1.12;
+  margin: 0 0 18px;
+  letter-spacing: -0.01em;
+}
+
+.hero p.lead {
+  font-size: 1.1rem;
+  color: #c7c9cc;
+  max-width: 46ch;
+  margin: 0 0 32px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hero-art {
+  display: flex;
+  justify-content: center;
+}
+
+/* App screenshots cropped to the phone frame. The crop cuts the phone off
+   at the bottom, so fade it out instead of showing a hard edge. */
+.phone-shot {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent);
+}
+
+.hero-note {
+  margin-top: 18px;
+  font-size: 0.85rem;
+  color: #8d9094;
+}
+
+/* Buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000000;
+}
+
+.btn-primary:hover {
+  background: var(--accent-pressed);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(246, 244, 242, 0.28);
+  color: #f6f4f2;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(246, 244, 242, 0.6);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-pressed);
+  color: var(--accent-text);
+}
+
+/* Sections */
+
+section {
+  padding: 88px 0;
+}
+
+.section-head {
+  max-width: 640px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.section-head .eyebrow {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.section-head h2 {
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+}
+
+.section-head p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+/* Feature grid */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.card .tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 100px;
+  margin-bottom: 14px;
+}
+
+.card .icon-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-bottom: 16px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Privacy band */
+
+.band {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.band-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.band h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  margin: 0 0 16px;
+}
+
+.checklist {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.98rem;
+}
+
+.checklist li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  background-image: linear-gradient(135deg, var(--accent), var(--accent-pressed));
+}
+
+.band-art {
+  display: flex;
+  justify-content: center;
+}
+
+/* Screenshot strip under the feature grid. Four across on desktop; a
+   horizontal scroller on small screens. */
+.screens {
+  list-style: none;
+  margin: 56px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.screens img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* Pricing */
+
+.pricing-card {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: #f6f4f2;
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+}
+
+.pricing-card .price {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin: 6px 0 2px;
+}
+
+.pricing-card .price-note {
+  color: #9c9994;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+.pricing-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 32px;
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.pricing-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: #d8d9db;
+}
+
+.pricing-list li::before {
+  content: '✓';
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* FAQ teaser / CTA */
+
+.cta-band {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 56px;
+  text-align: center;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.cta-band h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.cta-band p {
+  color: var(--text-muted);
+  margin: 0 0 28px;
+}
+
+.store-badge {
+  display: inline-block;
+  line-height: 0;
+}
+
+.store-badge img {
+  height: 52px;
+  width: auto;
+}
+
+/* Footer */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 0;
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+.footer-copy {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* FAQ page */
+
+.faq-hero {
+  padding: 64px 0 32px;
+  text-align: center;
+}
+
+.faq-hero h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin: 0 0 14px;
+}
+
+.faq-hero p {
+  color: var(--text-muted);
+  max-width: 52ch;
+  margin: 0 auto;
+}
+
+.faq-search {
+  max-width: 480px;
+  margin: 32px auto 0;
+  position: relative;
+}
+
+.faq-search input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.faq-search input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.faq-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+  align-items: start;
+  padding-bottom: 96px;
+}
+
+.faq-toc {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 6px;
+}
+
+.faq-toc a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.faq-toc a:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.faq-group {
+  padding: 0;
+  margin-bottom: 44px;
+  scroll-margin-top: 96px;
+}
+
+.faq-group h2 {
+  font-size: 1.3rem;
+  margin: 0 0 18px;
+}
+
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '+';
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.faq-item[open] summary::after {
+  content: '\2212';
+}
+
+.faq-item .faq-answer {
+  padding: 0 20px 20px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.faq-answer p {
+  margin: 0 0 10px;
+}
+
+.faq-answer p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-item[hidden],
+.faq-group[hidden] {
+  display: none;
+}
+
+.faq-empty {
+  display: none;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 0;
+}
+
+/* Simple content page (privacy) */
+
+.content-page {
+  padding-top: 64px;
+  padding-bottom: 96px;
+}
+
+.content-page h1 {
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  margin: 0 0 8px;
+}
+
+.content-page .updated {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0 0 40px;
+}
+
+.content-page h2 {
+  font-size: 1.25rem;
+  margin: 40px 0 12px;
+}
+
+.content-page p,
+.content-page li {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+}
+
+.content-page ul {
+  padding-left: 20px;
+}
+
+/* Responsive */
+
+@media (max-width: 880px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    padding-top: 56px;
+  }
+
+  .phone-shot {
+    max-width: 300px;
+  }
+
+  .screens {
+    grid-template-columns: repeat(5, 64%);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+  }
+
+  .screens li {
+    scroll-snap-align: start;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .band-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .faq-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .faq-toc {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .faq-toc a {
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-links {
+    position: fixed;
+    inset: 64px 16px auto 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+    gap: 14px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.18s ease;
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .screens {
+    grid-template-columns: repeat(5, 78%);
+  }
+
+  .pricing-card,
+  .cta-band {
+    padding: 32px 22px;
+  }
+
+  section {
+    padding: 64px 0;
+  }
+}
+
+/* Back to top (created by main.js). Hidden with visibility as well as
+   opacity, so it can't be tabbed to until it shows. */
+.to-top {
+  position: fixed;
+  left: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-text);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s;
+}
+
+.to-top:hover {
+  background: var(--accent-soft);
+}
+
+.to-top:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .to-top,
+  .to-top.visible {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Phones: smaller and closer to the corner, to cover less of the text beside it. */
+@media (max-width: 640px) {
+  .to-top {
+    left: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media print {
+  .to-top {
+    display: none;
+  }
+}
+
+/* LED-style hero sign (stands in for screenshots until device builds exist). */
+.led-sign {
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 20 / 3;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #000;
+  overflow: hidden;
+}
+.led-sign svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

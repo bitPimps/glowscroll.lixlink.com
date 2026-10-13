@@ -1,0 +1,33 @@
+name: Check site
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Internal links only: pages use root-relative paths (/faq.html, /#pricing),
+      # which --root-dir and --index-files resolve like GitHub Pages does. Checks
+      # pages, images and #anchors; external sites are skipped (--offline) so a
+      # slow third-party host can't fail a PR.
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --offline
+            --root-dir ${{ github.workspace }}
+            --index-files index.html
+            --include-fragments
+            --no-progress
+            '*.html'
+          fail: true
