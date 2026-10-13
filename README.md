@@ -32,7 +32,7 @@ Custom domain (manual, account owner):
 
 ## Analytics
 
-Google Analytics 4 through Google Tag Manager, using the **same GTM container as steady.lixlink.com** (`GTM-TBTCJTLQ`). If GA4 should report GlowScroll separately, add a GA4 tag or hostname filter for `glowscroll.lixlink.com` in that container. The app itself has no analytics. The planned share-link page (`/s`, app 1.1) must **not** load GTM, because the banner text is in its URL.
+Google Analytics 4 through Google Tag Manager, with GlowScroll's own container (`GTM-5RXX3PNS`). The GA4 tag is set up in that container, not in the HTML. The app itself has no analytics. The planned share-link page (`/s`, app 1.1) must **not** load GTM, because the banner text is in its URL.
 
 ## Code review before merging
 
