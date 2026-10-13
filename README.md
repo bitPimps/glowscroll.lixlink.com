@@ -5,7 +5,7 @@ Marketing and support site for **GlowScroll: LED Banner & Sign**, published by T
 ## Pages
 
 - `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (**"coming soon"** until the app is in the stores)
-- `faq.html`: searchable Help Center. Section ids (`#getting-started`, `#showing-signs`, `#saved-banners`, `#privacy-data`, `#premium`, `#troubleshooting`) are stable so in-app help can link to them
+- `faq.html`: searchable Help Center. Section ids (`#getting-started`, `#showing-signs`, `#saved-banners`, `#privacy-data`, `#backup-restore`, `#premium`, `#troubleshooting`) are stable so in-app help can link to them
 - `privacy.html`: privacy policy (App Store and Google Play require its URL)
 - `delete-data.html`: how to delete on-device data and purchase records
 - `404.html`: not-found page
@@ -52,4 +52,3 @@ Every claim must match what the app actually does. When a feature ships or chang
 - Real store badges and links in `index.html` `#download` (replace "coming soon"); add the price
 - Support mailbox `glowscroll-support@lixlink.com` exists
 - "Any language, any emoji" claim verified on real phones
-- When cloud backup and export/import ship in the app, add them to the home page, FAQ (`#backup-restore`), privacy policy and delete-data page

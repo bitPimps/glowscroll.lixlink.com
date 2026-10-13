@@ -1,6 +1,6 @@
 # GlowScroll: LED Banner & Sign
 
-> GlowScroll turns a phone or tablet into a bright scrolling LED sign for concerts, airport pickups, games and events. It is made by THE LIX GROUP LLC for iOS and Android and is coming soon (not yet in the app stores). There is no account, no ads and no tracking in the app; signs are stored on the user's device. It is free to use; a one-time Premium purchase (no subscription) unlocks extra looks and unlimited saved signs.
+> GlowScroll turns a phone or tablet into a bright scrolling LED sign for concerts, airport pickups, games and events. It is made by THE LIX GROUP LLC for iOS and Android and is coming soon (not yet in the app stores). There is no account, no ads and no tracking in the app; signs are stored on the user's device, with optional backup to the user's own iCloud or Google Drive. It is free to use; a one-time Premium purchase (no subscription) unlocks extra looks and fonts, unlimited saved signs, folders and automatic backup.
 
 ## Key facts
 
@@ -8,13 +8,14 @@
 - Category: Utilities (LED banner, scrolling text sign)
 - Account required: No
 - Data storage: On the user's device. No GlowScroll server.
-- Free: scrolling LED and smooth text, colors, speed and direction, blink and rainbow effects, mirror mode, Flash Safety, quick phrases, 20 saved signs, any language and emoji
-- Premium (one-time, no subscription): Square LED, Pixel and Neon looks, unlimited saved signs, future Premium features
+- Backup: Export/import a file (free); automatic backup to the user's own iCloud or Google Drive app folder (Premium).
+- Free: scrolling LED and smooth text, colors, speed and direction, blink and rainbow effects, mirror mode, Flash Safety, quick phrases, 22 templates, 4 fonts, 20 saved signs, export/import, any language and emoji
+- Premium (one-time, no subscription): Square LED, Pixel and Neon looks, 8 more fonts, unlimited saved signs, folders, automatic cloud backup, future Premium features
 - Support: glowscroll-support@lixlink.com
 
 ## Pages
 
 - [Home](https://glowscroll.lixlink.com/): What GlowScroll does, privacy approach and pricing
-- [Help Center / FAQ](https://glowscroll.lixlink.com/faq.html): Showing signs, styles, saved signs, privacy, Premium and troubleshooting
+- [Help Center / FAQ](https://glowscroll.lixlink.com/faq.html): Showing signs, styles, templates, fonts, saved signs and folders, backup and restore, privacy, Premium and troubleshooting
 - [Privacy Policy](https://glowscroll.lixlink.com/privacy.html): What data GlowScroll handles
-- [Delete your data](https://glowscroll.lixlink.com/delete-data.html): How to delete signs and purchase records
+- [Delete your data](https://glowscroll.lixlink.com/delete-data.html): How to delete signs, cloud backups and purchase records
