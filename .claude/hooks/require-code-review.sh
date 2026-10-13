@@ -68,7 +68,8 @@ case $tool in
   Bash)
     cmd=$(jq -r '.tool_input.command // ""' <<<"$input")
     # Switching the git hooks off, or skipping them.
-    if grep -Eq 'core\.hooks[Pp]ath' <<<"$cmd" && ! grep -Eq 'core\.hooks[Pp]ath[= ]+\.githooks([[:space:]]|$|[;&|])' <<<"$cmd"; then
+    # git config keys aren't case-sensitive.
+    if grep -Eiq 'core\.hookspath' <<<"$cmd" && ! grep -Eiq 'core\.hookspath[= ]+\.githooks([[:space:]]|$|[;&|])' <<<"$cmd"; then
       deny "Changing core.hooksPath away from .githooks is blocked: it switches off the review guard."
     fi
     if grep -Eq 'push' <<<"$cmd" && grep -Eq -- '--no-verify' <<<"$cmd"; then
