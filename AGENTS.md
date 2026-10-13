@@ -6,7 +6,12 @@ Static site for the GlowScroll app. Plain HTML/CSS, GitHub Pages from `main`: **
 
 Every merge into `main` must be preceded by the `/code-review` skill — run `/code-review high` on the branch against `main` (or the whole branch while `main` doesn't exist yet). Fix each finding, or record why it isn't a bug (in the commit message or the PR). Then check every internal link, image and `#anchor` (README → Checks).
 
-This is enforced: the PreToolUse hook in `.claude/settings.json` (`.claude/hooks/require-code-review.sh`) blocks `git merge` on `main`, `git push` to `main`, `gh pr merge` and the GitHub `merge_pull_request` tool unless the commit being merged is the one recorded by `scripts/mark-reviewed.sh`. Run that script only after the review on the final commit (fixes committed, checks green). Any new commit after it needs a new review. Never bypass the hook or write the mark by hand.
+This is enforced in two layers:
+
+- **`.githooks/pre-push`** (git) refuses any push that updates `main` on the remote, however the push is spelled, unless the commit is the one `scripts/mark-reviewed.sh` recorded. It's switched on by `git config core.hooksPath .githooks`, which `scripts/install-hooks.sh` and the SessionStart hook in `.claude/settings.json` set.
+- **`.claude/hooks/require-code-review.sh`** (Claude Code PreToolUse) keeps that on: it blocks `--no-verify`, changing `core.hooksPath`, and pushing while the guard is off. It also guards the paths around git: `gh pr merge N` and the GitHub tools' pull-request merge are checked against the PR's head commit on GitHub; committing straight to `main` through the GitHub tools and enabling auto-merge are refused.
+
+Run `scripts/mark-reviewed.sh` only after the review on the final commit (fixes committed, the internal link check (README → Checks) green). Any new commit after it needs a new review. Never bypass the guard or write the mark by hand.
 
 # Content
 

@@ -8,7 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
       toggle.setAttribute('aria-expanded', String(isOpen));
     });
     links.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => links.classList.remove('open'));
+      link.addEventListener('click', () => {
+        links.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
     });
   }
 
@@ -33,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   toTop.addEventListener('click', () => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
     // Keyboard users continue from the top of the page, not from the hidden button.
     document.querySelector('header a')?.focus({ preventScroll: true });
   });

@@ -29,8 +29,11 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+/* Smooth scrolling only for people who haven't asked for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -752,12 +755,16 @@ footer {
     transform: translateY(-12px);
     opacity: 0;
     pointer-events: none;
-    transition: all 0.18s ease;
+    /* Hidden from keyboard and screen readers too, once the fade-out ends. */
+    visibility: hidden;
+    transition: all 0.18s ease, visibility 0s linear 0.18s;
   }
 
   .nav-links.open {
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
+    transition: all 0.18s ease, visibility 0s;
     pointer-events: auto;
   }
 

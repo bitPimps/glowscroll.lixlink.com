@@ -1,33 +1,24 @@
 #!/usr/bin/env bash
-# PreToolUse hook: blocks merging into main unless /code-review was run on the
-# exact commit being merged. After the review (and its fixes are committed),
-# record it with: scripts/mark-reviewed.sh
-#
-# Covers: `git merge` while on main, `git push` that updates main (explicit
-# refspec, `--all`/`--mirror`, or a bare push while on main), `gh pr merge N`
-# and the GitHub MCP merge_pull_request tool (checked against the PR's head
-# commit on GitHub).
+# Claude Code PreToolUse hook. The real gate is the git pre-push hook
+# (.githooks/pre-push), which sees exactly which refs a push updates. This
+# hook keeps that gate switched on and unbypassed, and guards the ways to
+# change main that don't go through git push: merging a pull request and
+# committing through the GitHub tools. See AGENTS.md.
 set -uo pipefail
-
-CHECKS='check every internal link and anchor (README, Checks)'
 
 input=$(cat)
 
 deny() {
-  local r=$1
   if command -v jq >/dev/null 2>&1; then
-    jq -n --arg r "$r" '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: $r}}'
+    jq -n --arg r "$1" '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: $r}}'
     exit 0
   fi
-  echo "$r" >&2
-  exit 2 # blocking error, even without jq
+  echo "$1" >&2
+  exit 2
 }
 
-# Without jq nothing can be checked: block anything that might merge or push, allow the rest.
 if ! command -v jq >/dev/null 2>&1; then
-  if grep -Eq 'merge_pull_request|git[^"]*(push|merge)|gh[^"]*pr[^"]*merge' <<<"$input"; then
-    deny "Merge guard can't run without jq, so pushes and merges are blocked. Install jq."
-  fi
+  grep -Eq 'push|merge|github' <<<"$input" && deny "The merge guard needs jq, so pushes and merges are blocked until jq is installed."
   exit 0
 fi
 
@@ -35,92 +26,94 @@ tool=$(jq -r '.tool_name // ""' <<<"$input")
 cwd=$(jq -r '.cwd // ""' <<<"$input")
 [ -n "$cwd" ] || cwd=${CLAUDE_PROJECT_DIR:-$PWD}
 
-# Which repo the command runs in: a leading `cd DIR &&` or `git -C DIR` wins over the hook's cwd.
-repo_for() {
-  local cmd=$1 dir
-  dir=$(sed -nE 's/^[[:space:]]*cd[[:space:]]+([^;&|[:space:]]+).*/\1/p' <<<"$cmd")
-  [ -z "$dir" ] && dir=$(sed -nE 's/.*git[[:space:]]+-C[[:space:]]+([^;&|[:space:]]+).*/\1/p' <<<"$cmd")
-  [ -n "$dir" ] && { case $dir in /*) echo "$dir" ;; *) echo "$cwd/$dir" ;; esac; return; }
-  echo "$cwd"
-}
-
-guarded() { # repo carries the rule (has this hook file)
+guarded() { # a clone that carries this rule
   local top
   top=$(git -C "$1" rev-parse --show-toplevel 2>/dev/null) || return 1
-  [ -f "$top/.claude/hooks/require-code-review.sh" ]
+  [ -f "$top/.githooks/pre-push" ]
 }
 
-require_reviewed() { # $1 repo dir, $2 sha being merged
-  local repo=$1 sha=$2 marker reviewed last
-  marker="$(git -C "$repo" rev-parse --absolute-git-dir)/code-review-ok"
-  reviewed=$(cat "$marker" 2>/dev/null || true)
-  if [ "$reviewed" != "$sha" ]; then
-    last=${reviewed:-none}
-    deny "Merge into main blocked: commit ${sha:0:9} has no code review. Run the /code-review skill (\`/code-review high\` against main), fix or answer every finding, commit, $CHECKS, then run scripts/mark-reviewed.sh and retry. (Last reviewed commit: ${last:0:9}.)"
-  fi
+reviewed_sha() { cat "$(git -C "$1" rev-parse --absolute-git-dir)/code-review-ok" 2>/dev/null || true; }
+
+# Clones near the session: the cwd, the project, and folders next to or inside them.
+candidates() {
+  local base
+  for base in "$cwd" "${CLAUDE_PROJECT_DIR:-}"; do
+    [ -n "$base" ] || continue
+    echo "$base"
+    for d in "$base"/*/ "$(dirname "$base")"/*/; do [ -d "$d/.git" ] && echo "${d%/}"; done
+  done | awk '!seen[$0]++'
 }
 
-check_rev() { # $1 repo dir, $2 local commit-ish
-  guarded "$1" || return 0
-  local sha
-  sha=$(git -C "$1" rev-parse --verify --quiet "$2^{commit}" || true)
-  [ -n "$sha" ] || deny "Merge into main blocked: couldn't resolve '$2' to check its code review."
-  require_reviewed "$1" "$sha"
+clone_of() { # $1 owner, $2 repo: a local clone whose origin is exactly that repository
+  local want d url
+  want=$(tr '[:upper:]' '[:lower:]' <<<"$1/$2")
+  while read -r d; do
+    url=$(git -C "$d" remote get-url origin 2>/dev/null | tr '[:upper:]' '[:lower:]') || continue
+    url=${url%.git}
+    [ "${url##*github.com[:/]}" = "$want" ] && { echo "$d"; return 0; }
+  done < <(candidates)
+  return 1
 }
 
-check_pr() { # $1 repo dir, $2 PR number: the head commit as GitHub has it
-  guarded "$1" || return 0
-  local sha
+check_pr() { # $1 clone, $2 PR number
+  local sha reviewed
   sha=$(git -C "$1" ls-remote origin "refs/pull/$2/head" 2>/dev/null | cut -f1)
-  [ -n "$sha" ] || deny "Merge into main blocked: couldn't read PR #$2's head commit to check its code review."
-  require_reviewed "$1" "$sha"
+  [ -n "$sha" ] || deny "Merge blocked: couldn't read PR #$2's head commit to check its code review."
+  reviewed=$(reviewed_sha "$1")
+  [ "$sha" = "$reviewed" ] ||
+    deny "Merge blocked: PR #$2's head ${sha:0:9} has no code review. Run /code-review high against main, fix or answer every finding, commit and push, run the checks in AGENTS.md, then scripts/mark-reviewed.sh and retry. (Last reviewed commit: ${reviewed:-none}.)"
 }
 
 case $tool in
   Bash)
     cmd=$(jq -r '.tool_input.command // ""' <<<"$input")
-    repo=$(repo_for "$cmd")
-    current=$(git -C "$repo" branch --show-current 2>/dev/null || true)
-
-    if grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+push([[:space:]]|$)' <<<"$cmd"; then
-      push_args=$(sed -nE 's/.*git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+push([[:space:]]+(.*))?$/\3/p' <<<"$cmd" | sed -E 's/[;&|].*//')
-      if grep -Eq '(^|[[:space:]])--(all|mirror)([[:space:]]|$)' <<<"$push_args"; then
-        check_rev "$repo" main
-      elif src=$(grep -Eo '[^[:space:]]*:(refs/heads/)?main([[:space:]]|$)' <<<"$push_args" | head -1) && [ -n "$src" ]; then
-        src=${src%%:*}
-        check_rev "$repo" "${src:-HEAD}"
-      elif grep -Eq '(^|[[:space:]])(refs/heads/)?main([[:space:]]|$)' <<<"$push_args"; then
-        check_rev "$repo" main
-      else
-        # No refspec naming main: what gets pushed is the current branch (or its upstream).
-        positional=$(tr ' ' '\n' <<<"$push_args" | grep -Ev '^(-|$)' | wc -l)
-        if [ "$current" = main ] && [ "$positional" -le 1 ]; then check_rev "$repo" HEAD; fi
+    # Switching the git hooks off, or skipping them.
+    if grep -Eq 'core\.hooks[Pp]ath' <<<"$cmd" && ! grep -Eq 'core\.hooks[Pp]ath[= ]+\.githooks([[:space:]]|$|[;&|])' <<<"$cmd"; then
+      deny "Changing core.hooksPath away from .githooks is blocked: it switches off the review guard."
+    fi
+    if grep -Eq 'push' <<<"$cmd" && grep -Eq -- '--no-verify' <<<"$cmd"; then
+      deny "git push --no-verify is blocked: it skips the review guard."
+    fi
+    # A push from a guarded clone needs the pre-push hook switched on.
+    if grep -Eq '(^|[^[:alnum:]_-])git([[:space:]].*)?[[:space:]]push([[:space:]]|$)' <<<"$cmd"; then
+      while read -r d; do
+        guarded "$d" || continue
+        [ "$(git -C "$d" config core.hooksPath)" = .githooks ] ||
+          deny "Push blocked: the review guard isn't switched on in $d. Run scripts/install-hooks.sh there first."
+      done < <(candidates)
+    fi
+    # gh pr merge N: the PR's head must be the reviewed commit.
+    if grep -Eq '(^|[^[:alnum:]_-])gh[[:space:]]+pr[[:space:]]+merge' <<<"$cmd"; then
+      pr=$(sed -nE 's/.*gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+#?([0-9]+)([[:space:]]|$|[;&|]).*/\1/p' <<<"$cmd")
+      d=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || true)
+      if [ -n "$d" ] && guarded "$d"; then
+        [ -n "$pr" ] || deny "Merge blocked: write the PR number right after 'gh pr merge' so its head can be checked for a code review."
+        check_pr "$d" "$pr"
       fi
-    fi
-
-    # git merge while on main: the merged branch is what needs the review
-    if grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+merge[[:space:]]' <<<"$cmd" && [ "$current" = main ]; then
-      branch=$(sed -nE 's/.*git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+merge[[:space:]]+(-[^[:space:]]+[[:space:]]+)*([^-;&|[:space:]][^;&|[:space:]]*).*/\3/p' <<<"$cmd")
-      [ -n "$branch" ] && check_rev "$repo" "$branch"
-    fi
-
-    if grep -Eq '(^|[;&|[:space:]])gh[[:space:]]+pr[[:space:]]+merge' <<<"$cmd"; then
-      pr=$(grep -Eo 'gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+([^[:space:]]+[[:space:]]+)*#?[0-9]+' <<<"$cmd" | grep -Eo '[0-9]+$' | head -1)
-      if [ -n "$pr" ]; then check_pr "$repo" "$pr"; else guarded "$repo" && deny "Merge into main blocked: give gh pr merge a PR number so its head commit can be checked for a code review."; fi
     fi
     ;;
-  mcp__github__merge_pull_request)
-    pr=$(jq -r '.tool_input.pullNumber // .tool_input.pull_number // ""' <<<"$input")
-    repo_name=$(jq -r '.tool_input.repo // ""' <<<"$input")
-    # The clone for that repository: the session's project, or a sibling folder named after it.
-    repo=${CLAUDE_PROJECT_DIR:-$cwd}
-    for candidate in "$cwd" "$cwd/$repo_name" "$(dirname "$cwd")/$repo_name" "$repo"; do
-      if [ -n "$repo_name" ] && git -C "$candidate" remote get-url origin 2>/dev/null | grep -qi "/$repo_name\(\.git\)\?$"; then
-        repo=$candidate
-        break
-      fi
-    done
-    [ -n "$pr" ] && check_pr "$repo" "$pr"
+  mcp__*github*)
+    owner=$(jq -r '.tool_input.owner // ""' <<<"$input")
+    repo=$(jq -r '.tool_input.repo // ""' <<<"$input")
+    d=$(clone_of "$owner" "$repo" || true)
+    # Only repositories that carry the rule, as far as a local clone shows.
+    if [ -z "$d" ]; then
+      case $tool in
+        *__merge_pull_request|*__enable_pr_auto_merge)
+          deny "Merge blocked: no local clone of $owner/$repo here to check its code review. Clone it, or merge from the repository's own session." ;;
+      esac
+      exit 0
+    fi
+    guarded "$d" || exit 0
+    case $tool in
+      *__merge_pull_request)
+        check_pr "$d" "$(jq -r '.tool_input.pullNumber // .tool_input.pull_number // ""' <<<"$input")" ;;
+      *__enable_pr_auto_merge)
+        deny "Auto-merge is blocked: the PR would merge later without a check that its final commit was reviewed. Merge it once it's reviewed instead." ;;
+      *__push_files|*__create_or_update_file|*__delete_file)
+        branch=$(jq -r '.tool_input.branch // "main"' <<<"$input")
+        [ "$branch" = main ] && deny "Committing straight to main through GitHub is blocked. Commit to a branch, get it reviewed, then merge." ;;
+    esac
     ;;
 esac
 exit 0
