@@ -4,9 +4,9 @@ Static site for the GlowScroll app. Plain HTML/CSS, GitHub Pages from `main`: **
 
 # Code review before merges (always)
 
-Same rule as the app repo (`bitPimps/glowscroll`, `AGENTS.md`) and ThymeIt's site: work on a branch and run `/code-review high` on it against `main` before pushing to `main` or opening a PR into it. Fix each finding, or record why it isn't a bug in the commit message or the PR. Re-run the review only when a fix changes more than the finding it answers.
+Same rule as the app repo (`bitPimps/glowscroll`, `AGENTS.md`) and ThymeIt's site: work on a branch, run `/code-review high` on it against `main`, and land it through a PR into `main`. Don't push straight to `main`: every push there goes live before CI has run. Fix each finding, or record why it isn't a bug in the commit message or the PR. Re-run the review only when a fix changes more than the finding it answers.
 
-CI (`.github/workflows/check.yml`) checks every internal link, image and `#anchor`, and the GTM container, on each PR and push to `main`. Don't merge while it's red.
+CI (`.github/workflows/check.yml`) checks every internal link, image and `#anchor`, and the GTM container, on each PR and push to `main`. Don't merge a PR while it's red.
 
 # Content
 
