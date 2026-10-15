@@ -36,11 +36,11 @@ Google Analytics 4 through Google Tag Manager, with GlowScroll's own container (
 
 ## Code review before merging
 
-Every change to `main` gets a `/code-review high` pass before it's pushed, same rule as the app repo (see `AGENTS.md`).
+Every change to `main` gets a `/code-review high` pass and lands through a PR, same rule as the app repo (see `AGENTS.md`).
 
 ## Checks
 
-`.github/workflows/check.yml` runs [lychee](https://github.com/lycheeverse/lychee) on every PR and push to `main` and fails on a broken internal link, image or `#anchor`. Locally:
+`.github/workflows/check.yml` runs [lychee](https://github.com/lycheeverse/lychee) on every PR and push to `main` and fails on a broken internal link, image or `#anchor`. It also checks that every page loads GlowScroll's GTM container (`GTM-5RXX3PNS`, script and noscript) and no other. Locally:
 
 ```
 lychee --offline --root-dir "$PWD" --index-files index.html --include-fragments '*.html'
