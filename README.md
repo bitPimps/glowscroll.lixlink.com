@@ -36,7 +36,7 @@ Google Analytics 4 through Google Tag Manager, with GlowScroll's own container (
 
 ## Code review before merging
 
-Every merge into `main` needs `/code-review high` first, enforced by a hook (see `AGENTS.md`).
+Every change to `main` gets a `/code-review high` pass before it's pushed, same rule as the app repo (see `AGENTS.md`).
 
 ## Checks
 
@@ -50,7 +50,7 @@ Dependabot opens a monthly PR to bump GitHub Actions versions.
 
 ## Keeping the site in sync
 
-Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section, `llms.txt` and the home page. Never advertise unshipped features.
+Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section (and its FAQPage JSON-LD), `llms.txt` and the home page. Never advertise unshipped features. The feature → site map and the sync log of updates still owed live in the app repo: `docs/07-roadmap-and-delivery.md` → "Keeping the site in sync".
 
 **Before launch, check:**
 - Real store badges and links in `index.html` `#download` (replace "coming soon"); add the price
