@@ -52,7 +52,10 @@ Dependabot opens a monthly PR to bump GitHub Actions versions.
 
 Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section (and its FAQPage JSON-LD), `llms.txt` and the home page. Never advertise unshipped features. The feature → site map and the sync log of updates still owed live in the app repo: `docs/07-roadmap-and-delivery.md` → "Keeping the site in sync".
 
-**When the iPhone version ships:** add the App Store badge and link to `index.html` `#download`, put iCloud back next to Google Drive on the home page (backup card and pricing list), say export/import works between iPhone and Android again, update the Family Sharing answer in the FAQ, set `operatingSystem` to "iOS, Android" in the home page JSON-LD, and update `llms.txt`.
+**When the iPhone version ships**, put back what was taken out for the Android-only launch (2026-10-30):
+- `index.html`: App Store badge and link in `#download` (drop "Coming soon to iPhone"); iCloud next to Google Drive in the Automatic backup card, the privacy checklist and the pricing list; "even between iPhone and Android" in Export and import; `operatingSystem` "iOS, Android" in the JSON-LD; "Family Sharing on iPhone" in the price note.
+- `faq.html` (visible text and JSON-LD): iCloud (iPhone) in "What does automatic backup do?" and "Do they stay in step?"; "This works between iPhone and Android too" in "How do I move my signs to a new phone?"; Apple ID in "I bought Premium…"; the edge swipe on iPhone or iPad in "How do I pause or exit?"; the question "Does Premium carry over between iPhone and Android?" (No: Apple and Google keep purchases separate); Family Sharing: yes on iPhone and iPad.
+- `llms.txt`: platforms, iCloud backup.
 
 **Still to check:**
 - Support mailbox `glowscroll-support@lixlink.com` exists

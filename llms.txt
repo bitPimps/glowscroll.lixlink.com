@@ -1,6 +1,6 @@
 # GlowScroll: LED Banner & Sign
 
-> GlowScroll turns a phone or tablet into a bright scrolling LED sign for concerts, airport pickups, games and events. It is made by THE LIX GROUP LLC and is available on Google Play for Android; the iPhone version is coming soon. There is no account, no ads and no tracking in the app; signs are stored on the user's device, with optional backup to the user's own iCloud or Google Drive. It is free to use; a one-time Premium purchase (no subscription) unlocks extra looks, effects and fonts, unlimited saved signs, folders and automatic backup.
+> GlowScroll turns a phone or tablet into a bright scrolling LED sign for concerts, airport pickups, games and events. It is made by THE LIX GROUP LLC and is available on Google Play for Android (every country except Japan); the iPhone version is coming soon. There is no account, no ads and no tracking in the app; signs are stored on the user's device, with optional backup to the user's own Google Drive. It is free to use; a one-time Premium purchase (no subscription) unlocks extra looks, effects and fonts, unlimited saved signs, folders and automatic backup.
 
 ## Key facts
 
@@ -8,7 +8,7 @@
 - Category: Utilities (LED banner, scrolling text sign)
 - Account required: No
 - Data storage: On the user's device. No GlowScroll server.
-- Backup: Export/import a file (free); automatic backup to the user's own iCloud or Google Drive app folder (Premium).
+- Backup: Export/import a file (free); automatic backup to the user's own Google Drive app folder (Premium).
 - Free: scrolling LED and smooth text, any color (including custom colors), dot size and glow presets, speed and direction, blink and rainbow effects, mirror mode, Flash Safety, quick phrases, Show last, 22 templates, 4 fonts, 20 saved signs (copy, edit, delete), export/import, any language and emoji
 - Premium ($5.99 one-time in the US, no subscription): Square LED, Pixel and Neon looks, Sparkle, Wave, Typewriter and Color cycle effects, gradient text, exact dot size and glow, 8 more fonts, unlimited saved signs, folders, automatic backup to the user's own Google Drive, future Premium features. Premium looks can be tried for free; saving a sign that uses one needs Premium
 - Support: glowscroll-support@lixlink.com
