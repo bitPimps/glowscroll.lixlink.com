@@ -466,6 +466,18 @@ section {
   margin: 0 0 28px;
 }
 
+.store-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.cta-band p:last-child {
+  margin-bottom: 0;
+}
+
 .store-badge {
   display: inline-block;
   line-height: 0;
