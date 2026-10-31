@@ -4,7 +4,7 @@ Marketing and support site for **GlowScroll: LED Banner & Sign**, published by T
 
 ## Pages
 
-- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (**"coming soon"** until the app is in the stores)
+- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (Google Play badge; iPhone "coming soon" until it is in the App Store)
 - `faq.html`: searchable Help Center. Section ids (`#getting-started`, `#showing-signs`, `#saved-banners`, `#privacy-data`, `#backup-restore`, `#premium`, `#troubleshooting`) are stable so in-app help can link to them
 - `privacy.html`: privacy policy (App Store and Google Play require its URL)
 - `delete-data.html`: how to delete on-device data and purchase records
@@ -52,7 +52,8 @@ Dependabot opens a monthly PR to bump GitHub Actions versions.
 
 Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section (and its FAQPage JSON-LD), `llms.txt` and the home page. Never advertise unshipped features. The feature → site map and the sync log of updates still owed live in the app repo: `docs/07-roadmap-and-delivery.md` → "Keeping the site in sync".
 
-**Before launch, check:**
-- Real store badges and links in `index.html` `#download` (replace "coming soon"); add the price
+**Still to do for launch:**
+- App Store badge and link in `index.html` `#download` once the iPhone app is live (replace its "coming soon" line), and `operatingSystem` / `installUrl` in its JSON-LD. Google Play is done. Store links use the UTM tags of the Play link there (as steady.lixlink.com)
+- The price
 - Support mailbox `glowscroll-support@lixlink.com` exists
 - "Any language, any emoji" claim verified on real phones
