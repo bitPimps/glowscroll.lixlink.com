@@ -4,7 +4,7 @@ Marketing and support site for **GlowScroll: LED Banner & Sign**, published by T
 
 ## Pages
 
-- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (Google Play badge; iPhone "coming soon" until it is in the App Store)
+- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (Google Play badge; iPhone **"coming soon"** until it's in the App Store)
 - `faq.html`: searchable Help Center. Section ids (`#getting-started`, `#showing-signs`, `#saved-banners`, `#privacy-data`, `#backup-restore`, `#premium`, `#troubleshooting`) are stable so in-app help can link to them
 - `privacy.html`: privacy policy (App Store and Google Play require its URL)
 - `delete-data.html`: how to delete on-device data and purchase records
@@ -52,8 +52,11 @@ Dependabot opens a monthly PR to bump GitHub Actions versions.
 
 Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section (and its FAQPage JSON-LD), `llms.txt` and the home page. Never advertise unshipped features. The feature → site map and the sync log of updates still owed live in the app repo: `docs/07-roadmap-and-delivery.md` → "Keeping the site in sync".
 
-**Still to do for launch:**
-- App Store badge and link in `index.html` `#download` once the iPhone app is live (replace its "coming soon" line), and `operatingSystem` / `installUrl` in its JSON-LD. Google Play is done. Store links use the UTM tags of the Play link there (as steady.lixlink.com)
-- The price
+**When the iPhone version ships**, put back what was taken out for the Android-only launch (2026-10-30):
+- `index.html`: App Store badge and link in `#download` (drop "Coming soon to iPhone"); iCloud next to Google Drive in the Automatic backup card, the privacy checklist and the pricing list; "even between iPhone and Android" in Export and import; `operatingSystem` "iOS, Android" in the JSON-LD; "Family Sharing on iPhone" in the price note.
+- `faq.html` (visible text and JSON-LD): iCloud (iPhone) in "What does automatic backup do?" and "Do they stay in step?"; "This works between iPhone and Android too" in "How do I move my signs to a new phone?"; Apple ID in "I bought Premium…"; the edge swipe on iPhone or iPad in "How do I pause or exit?"; the question "Does Premium carry over between iPhone and Android?" (No: Apple and Google keep purchases separate); Family Sharing: yes on iPhone and iPad.
+- `llms.txt`: platforms, iCloud backup.
+
+**Still to check:**
 - Support mailbox `glowscroll-support@lixlink.com` exists
 - "Any language, any emoji" claim verified on real phones
