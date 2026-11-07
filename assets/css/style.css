@@ -903,7 +903,10 @@ footer {
   max-width: 520px;
   aspect-ratio: 20 / 3;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  /* An inset outline rather than a border, so the whole height is sign and
+     the scrolling sign's LEDs round to the larger whole pixel. */
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
   background: #000;
   overflow: hidden;
   position: relative;
@@ -915,67 +918,83 @@ footer {
 }
 
 /* The scrolling sign. Off by default: the still image shows for visitors who
-   ask for reduced motion, and in browsers without container units.
+   ask for reduced motion, and in browsers without container units or round().
    hero-sign-scroll.png is one loop of the app's default banner (24 rows,
-   16 LEDs a second), drawn with the app's LED shader by
-   store/tools/site-sign.mjs in the app repo, which prints the loop length
-   (--sign-loop and the steps() count below must both match it). The
-   track holds two loops side by side and moves one LED per step, like the
-   app, so the dot grid stays put while the text moves across it. */
+   16 LEDs a second, 10 px per LED), drawn with the app's LED shader by
+   store/tools/site-sign.mjs in the app repo, which prints --sign-loop and
+   --sign-start (CI checks --sign-loop against the image's width). The track
+   holds two loops side by side and moves one LED per step, like the app, so
+   the dot grid stays put while the text moves across it. One LED is rounded
+   down to whole pixels, so every step moves the image by the same whole
+   number of pixels: no shimmer, and no seam where the loop wraps. */
 .led-scroll,
-.led-pause {
+.led-controls {
   display: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  @supports (height: 1cqh) {
-    .led-sign {
+  @supports (height: round(down, 1cqh, 1px)) {
+    .hero-art {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero .led-sign {
       container-type: size;
     }
 
     .led-scroll {
-      --sign-loop: 299; /* LEDs per loop; site-sign.mjs prints it */
-      --led: calc(100cqh / 24); /* one LED; the sign is 24 rows */
-      display: block;
+      --sign-loop: 299; /* LEDs per loop */
+      --sign-start: 147; /* LEDs into the loop where the text is centered, as in the still sign */
+      --led: round(down, 100cqh / 24, 1px); /* one LED; the sign is 24 rows */
+      display: flex;
+      align-items: center;
       position: absolute;
       inset: 0;
       background: #000;
     }
 
     .led-scroll-track {
-      height: 100%;
+      flex: none;
+      height: calc(var(--led) * 24);
       width: calc(var(--led) * var(--sign-loop) * 2);
-      background: url('/assets/img/hero-sign-scroll.png') left top / auto 100% repeat-x;
-      animation: led-scroll calc(var(--sign-loop) * 1s / 16) steps(299) infinite;
+      background: url('/assets/img/hero-sign-scroll.png') left top / calc(var(--led) * var(--sign-loop)) 100% repeat-x;
+      /* Starts half an LED into the step where the text is centered, so the
+         first frame matches the still sign. */
+      animation: led-scroll calc(var(--sign-loop) * 1s / 16) steps(var(--sign-loop)) infinite;
+      animation-delay: calc((var(--sign-start) + 0.5) * -1s / 16);
     }
 
-    .led-sign.paused .led-scroll-track {
+    .led-sign.paused .led-scroll-track,
+    .led-sign.offscreen .led-scroll-track {
       animation-play-state: paused;
     }
 
-    .led-pause {
-      display: grid;
-      place-items: center;
-      position: absolute;
-      right: 6px;
-      bottom: 6px;
-      width: 24px;
-      height: 24px;
-      padding: 0;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: rgba(11, 11, 13, 0.8);
-      color: var(--text-muted);
-      cursor: pointer;
-      opacity: 0.55;
-      transition: opacity 0.2s ease;
+    .led-controls {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      max-width: 520px;
+      margin-top: 10px;
     }
 
-    .led-pause:hover,
-    .led-pause:focus-visible,
-    .led-sign.paused .led-pause {
-      opacity: 1;
+    .led-pause {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .led-pause:hover {
       color: var(--text);
+      border-color: var(--text-muted);
     }
 
     .led-pause:focus-visible {

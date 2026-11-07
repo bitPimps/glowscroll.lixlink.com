@@ -43,3 +43,16 @@ jobs:
           if grep -rEn --include='*.html' 'GTM-[A-Z0-9]+' . | grep -v 'GTM-5RXX3PNS'; then echo "Other GTM container found"; status=1; fi
           if [ -d s ] && grep -rln --include='*.html' 'googletagmanager' s; then echo "s/ must not load GTM"; status=1; fi
           exit $status
+
+      # The scrolling hero sign: its image is referenced from CSS, which the link
+      # check doesn't read, and --sign-loop must equal the image's width in LEDs
+      # (10 px each), or the text tears once per loop.
+      - name: Check hero sign loop
+        run: |
+          img=assets/img/hero-sign-scroll.png
+          [ -f "$img" ] || { echo "$img is missing"; exit 1; }
+          width=$(python3 -c "import struct,sys; print(struct.unpack('>I', open(sys.argv[1],'rb').read()[16:20])[0])" "$img")
+          loop=$(grep -oE -- '--sign-loop: *[0-9]+' assets/css/style.css | grep -oE '[0-9]+$')
+          [ "$((width % 10))" -eq 0 ] && [ "$((width / 10))" = "$loop" ] || { echo "$img is $width px wide ($((width / 10)) LEDs) but style.css has --sign-loop: $loop"; exit 1; }
+          grep -q "url('/$img')" assets/css/style.css || { echo "style.css doesn't use /$img"; exit 1; }
+          echo "Loop: $loop LEDs"
