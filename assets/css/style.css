@@ -471,11 +471,9 @@ section {
   flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
-  margin-bottom: 24px;
 }
 
-.cta-band p:last-child,
-.cta-band .store-badges:last-child {
+.cta-band p:last-child {
   margin-bottom: 0;
 }
 

@@ -4,7 +4,7 @@ Marketing and support site for **GlowScroll: LED Banner & Sign**, published by T
 
 ## Pages
 
-- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (App Store and Google Play badges). `index.html` and `faq.html` carry Apple's Smart App Banner tag (`apple-itunes-app`, app id `6823257051`)
+- `index.html`: landing page: what GlowScroll does, features, privacy, pricing, download (App Store and Google Play badges). Every page except `404.html` carries Apple's Smart App Banner tag (`apple-itunes-app`, app id `6823257051`)
 - `faq.html`: searchable Help Center. Section ids (`#getting-started`, `#showing-signs`, `#saved-banners`, `#privacy-data`, `#backup-restore`, `#premium`, `#troubleshooting`) are stable so in-app help can link to them
 - `privacy.html`: privacy policy (App Store and Google Play require its URL)
 - `delete-data.html`: how to delete on-device data and purchase records
