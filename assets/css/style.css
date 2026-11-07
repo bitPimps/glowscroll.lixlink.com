@@ -474,7 +474,8 @@ section {
   margin-bottom: 24px;
 }
 
-.cta-band p:last-child {
+.cta-band p:last-child,
+.cta-band .store-badges:last-child {
   margin-bottom: 0;
 }
 
