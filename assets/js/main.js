@@ -41,6 +41,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('header a')?.focus({ preventScroll: true });
   });
 
+  // Pause button for the scrolling hero sign (moving content needs one,
+  // WCAG 2.2.2). CSS shows it only while the sign scrolls.
+  const sign = document.querySelector('.led-scroll')?.closest('.led-sign');
+  if (sign) {
+    const pause = document.createElement('button');
+    pause.type = 'button';
+    pause.className = 'led-pause';
+    const icons = {
+      pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+      play: '<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5z"/>',
+    };
+    const show = (paused) => {
+      sign.classList.toggle('paused', paused);
+      pause.setAttribute('aria-label', paused ? 'Play the scrolling sign' : 'Pause the scrolling sign');
+      pause.innerHTML =
+        '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">' +
+        (paused ? icons.play : icons.pause) +
+        '</svg>';
+    };
+    show(false);
+    pause.addEventListener('click', () => show(!sign.classList.contains('paused')));
+    sign.appendChild(pause);
+  }
+
   // FAQ search filter (faq.html only)
   const search = document.getElementById('faq-search');
   if (!search) return;

@@ -243,6 +243,36 @@ img {
   color: var(--accent-text);
 }
 
+/* A soft amber glow on hover and keyboard focus, like a lit LED. It lights
+   once and stays; nothing loops. The fade only plays for visitors who
+   haven't asked for reduced motion. */
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.nav-links a.nav-cta:hover,
+.nav-links a.nav-cta:focus-visible {
+  box-shadow: 0 0 18px rgba(255, 176, 0, 0.45);
+}
+
+.btn-ghost:hover,
+.btn-ghost:focus-visible,
+.btn-outline:hover,
+.btn-outline:focus-visible {
+  box-shadow: 0 0 14px rgba(255, 176, 0, 0.2);
+}
+
+.btn:focus-visible,
+.nav-links a.nav-cta:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn,
+  .nav-links a.nav-cta {
+    transition: box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+}
+
 /* Sections */
 
 section {
@@ -876,9 +906,87 @@ footer {
   border: 1px solid var(--border);
   background: #000;
   overflow: hidden;
+  position: relative;
 }
 .led-sign svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* The scrolling sign. Off by default: the still image shows for visitors who
+   ask for reduced motion, and in browsers without container units.
+   hero-sign-scroll.png is one loop of the app's default banner (24 rows,
+   16 LEDs a second), drawn with the app's LED shader by
+   store/tools/site-sign.mjs in the app repo, which prints the loop length
+   (--sign-loop and the steps() count below must both match it). The
+   track holds two loops side by side and moves one LED per step, like the
+   app, so the dot grid stays put while the text moves across it. */
+.led-scroll,
+.led-pause {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (height: 1cqh) {
+    .led-sign {
+      container-type: size;
+    }
+
+    .led-scroll {
+      --sign-loop: 299; /* LEDs per loop; site-sign.mjs prints it */
+      --led: calc(100cqh / 24); /* one LED; the sign is 24 rows */
+      display: block;
+      position: absolute;
+      inset: 0;
+      background: #000;
+    }
+
+    .led-scroll-track {
+      height: 100%;
+      width: calc(var(--led) * var(--sign-loop) * 2);
+      background: url('/assets/img/hero-sign-scroll.png') left top / auto 100% repeat-x;
+      animation: led-scroll calc(var(--sign-loop) * 1s / 16) steps(299) infinite;
+    }
+
+    .led-sign.paused .led-scroll-track {
+      animation-play-state: paused;
+    }
+
+    .led-pause {
+      display: grid;
+      place-items: center;
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(11, 11, 13, 0.8);
+      color: var(--text-muted);
+      cursor: pointer;
+      opacity: 0.55;
+      transition: opacity 0.2s ease;
+    }
+
+    .led-pause:hover,
+    .led-pause:focus-visible,
+    .led-sign.paused .led-pause {
+      opacity: 1;
+      color: var(--text);
+    }
+
+    .led-pause:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+  }
+}
+
+@keyframes led-scroll {
+  to {
+    transform: translateX(calc(var(--led) * var(--sign-loop) * -1));
+  }
 }

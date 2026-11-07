@@ -20,7 +20,7 @@ assets/img/            favicons, app icon, og-image.png (1200×630), LED sign im
 .nojekyll              tells GitHub Pages not to run Jekyll (needed later for .well-known/)
 ```
 
-The LED sign images and icons were drawn with the app's own LED shader and icon (`scripts/make-icons.mjs` in the app repo). They stay: the hero sign and `og-image.png` show the real LED look, which reads better at those sizes than a screenshot (decided 2026-11-06). `assets/img/screens/*.webp` (home page "See it in action": concert, home, editor, templates, sports) are five of the app's App Store screenshots, rendered from the real app. When those are re-rendered, refresh them from the app repo with `python3 store/tools/site-screens.py ../glowscroll.lixlink.com`, and check the alt text in `index.html` still describes them.
+The LED sign images and icons were drawn with the app's own LED shader and icon (`scripts/make-icons.mjs` in the app repo). The hero sign (`hero-sign.png`, plus `hero-sign-scroll.png`, which `style.css` scrolls one LED at a time for visitors who haven't asked for reduced motion, with a pause button from `main.js`) comes from `store/tools/site-sign.mjs` in the app repo. They stay: the hero sign and `og-image.png` show the real LED look, which reads better at those sizes than a screenshot (decided 2026-11-06). `assets/img/screens/*.webp` (home page "See it in action": concert, home, editor, templates, sports) are five of the app's App Store screenshots, rendered from the real app. When those are re-rendered, refresh them from the app repo with `python3 store/tools/site-screens.py ../glowscroll.lixlink.com`, and check the alt text in `index.html` still describes them.
 
 ## Deployment
 
