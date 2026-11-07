@@ -191,16 +191,6 @@ img {
   justify-content: center;
 }
 
-/* App screenshots cropped to the phone frame. The crop cuts the phone off
-   at the bottom, so fade it out instead of showing a hard edge. */
-.phone-shot {
-  width: 100%;
-  max-width: 380px;
-  height: auto;
-  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
-  mask-image: linear-gradient(to bottom, #000 78%, transparent);
-}
-
 .hero-note {
   margin-top: 18px;
   font-size: 0.85rem;
@@ -378,24 +368,6 @@ section {
 .band-art {
   display: flex;
   justify-content: center;
-}
-
-/* Screenshot strip under the feature grid. Four across on desktop; a
-   horizontal scroller on small screens. */
-.screens {
-  list-style: none;
-  margin: 56px 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-}
-
-.screens img {
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
 }
 
 /* Pricing */
@@ -746,21 +718,6 @@ footer {
     padding-top: 56px;
   }
 
-  .phone-shot {
-    max-width: 300px;
-  }
-
-  .screens {
-    grid-template-columns: repeat(5, 64%);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 8px;
-  }
-
-  .screens li {
-    scroll-snap-align: start;
-  }
-
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -833,10 +790,6 @@ footer {
 
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .screens {
-    grid-template-columns: repeat(5, 78%);
   }
 
   .pricing-card,
@@ -914,7 +867,7 @@ footer {
   }
 }
 
-/* LED-style hero sign (stands in for screenshots until device builds exist). */
+/* LED-style hero sign, drawn with the app's own LED shader. */
 .led-sign {
   width: 100%;
   max-width: 520px;
