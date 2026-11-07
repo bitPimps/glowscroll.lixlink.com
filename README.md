@@ -20,7 +20,7 @@ assets/img/            favicons, app icon, og-image.png (1200×630), LED sign im
 .nojekyll              tells GitHub Pages not to run Jekyll (needed later for .well-known/)
 ```
 
-The LED sign images and icons were drawn with the app's own LED shader and icon (`scripts/make-icons.mjs` in the app repo). Replace them with real screenshots once device builds exist.
+The LED sign images and icons were drawn with the app's own LED shader and icon (`scripts/make-icons.mjs` in the app repo). `assets/img/screens/*.webp` (home page "See it in action") are the app's App Store screenshots (`store/app-store/screenshots/iphone-medium/` in the app repo, rendered from the real app by `store/tools/render.js`), resized to 460 px wide. When those are re-rendered, refresh these too.
 
 ## Deployment
 
