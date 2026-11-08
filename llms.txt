@@ -10,7 +10,7 @@
 - Data storage: On the user's device. No GlowScroll server.
 - Backup: Export/import a file (free); automatic backup to the user's own iCloud or Google Drive app folder (Premium).
 - Free: scrolling LED and smooth text, any color (including custom colors), dot size and glow presets, speed and direction, blink and rainbow effects, mirror mode, Flash Safety, quick phrases, Show last, 22 templates, 4 fonts, 20 saved signs (copy, edit, delete), export/import, any language and emoji
-- Premium ($5.99 one-time in the US, no subscription; Family Sharing on iPhone and iPad): Square LED, Pixel and Neon looks, Sparkle, Wave, Typewriter and Color cycle effects, gradient text, exact dot size and glow, 8 more fonts, unlimited saved signs, folders, automatic backup to the user's own iCloud or Google Drive, future Premium features. Premium looks can be tried for free; saving a sign that uses one needs Premium
+- Premium ($5.99 one-time in the US, no subscription; Family Sharing on iPhone and iPad): Square LED, Pixel and Neon looks, Sparkle, Wave, Typewriter and Color cycle effects, gradient text, exact dot size and glow, 8 more templates that use those looks and effects, 8 more fonts, unlimited saved signs, folders, automatic backup to the user's own iCloud or Google Drive, future Premium features. Premium looks can be tried for free; saving a sign that uses one needs Premium
 - Support: glowscroll-support@lixlink.com
 
 ## Pages
