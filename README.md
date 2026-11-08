@@ -53,5 +53,4 @@ Dependabot opens a monthly PR to bump GitHub Actions versions.
 Every claim must match what the app actually does. When a feature ships or changes in the app, update the matching FAQ section (and its FAQPage JSON-LD), `llms.txt` and the home page. Never advertise unshipped features. The feature → site map and the sync log of updates still owed live in the app repo: `docs/07-roadmap-and-delivery.md` → "Keeping the site in sync".
 
 **Still to check:**
-- Support mailbox `glowscroll-support@lixlink.com` exists
 - "Any language, any emoji" claim verified on real phones
